@@ -88,12 +88,12 @@ public class DrillPlayerListener extends PlayerListener{
     		return bblock;
     	}
     	if(direction == 3){
-    		Block Wblock = world.getBlockAt(clicked.getX()-1, clicked.getY(), clicked.getZ());
-    		return Wblock;
+    		Block Eblock = world.getBlockAt(clicked.getX()-1, clicked.getY(), clicked.getZ());
+    		return Eblock;
     	}
     	if(direction == 4){
-    		Block Eblock = world.getBlockAt(clicked.getX()+1, clicked.getY(), clicked.getZ());
-    		return Eblock;
+    		Block Wblock = world.getBlockAt(clicked.getX()+1, clicked.getY(), clicked.getZ());
+    		return Wblock;
     	}
     	if(direction == 5){
     		Block Nblock = world.getBlockAt(clicked.getX(), clicked.getY(), clicked.getZ()-1);

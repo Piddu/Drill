@@ -56,10 +56,10 @@ public class DrillBlockListener extends BlockListener{
 		if(bblock.getTypeId() == base){
 			return 2;
 		}
-		if(Wblock.getTypeId() == base){
+		if(Eblock.getTypeId() == base){
 			return 3;
 		}
-		if(Eblock.getTypeId() == base){
+		if(Wblock.getTypeId() == base){
 			return 4;
 		}
 		if(Nblock.getTypeId() == base){
@@ -82,12 +82,12 @@ public class DrillBlockListener extends BlockListener{
     		return bblock;
     	}
     	if(direction == 3){
-    		Block Wblock = world.getBlockAt(clicked.getX()+1, clicked.getY(), clicked.getZ());
-    		return Wblock;
-    	}
-    	if(direction == 4){
     		Block Eblock = world.getBlockAt(clicked.getX()-1, clicked.getY(), clicked.getZ());
     		return Eblock;
+    	}
+    	if(direction == 4){
+    		Block Wblock = world.getBlockAt(clicked.getX()+1, clicked.getY(), clicked.getZ());
+    		return Wblock;
     	}
     	if(direction == 5){
     		Block Nblock = world.getBlockAt(clicked.getX(), clicked.getY(), clicked.getZ()-1);
