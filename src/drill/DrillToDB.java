@@ -1,11 +1,14 @@
 package drill;
 
+//import java.io.File;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
-import com.alta189.sqlLibrary.SQLite.*;
+import com.alta189.sqlLibrary.SQLite.sqlCore;
+
+//import com.alta189.sqlLibrary.SQLite.*;
 
 
 public class DrillToDB {
@@ -20,17 +23,15 @@ public class DrillToDB {
 	
 	//Logger
     Logger log = Logger.getLogger("Minecraft");
-	
-
+       	
 	//DB Directory Stuff
 	public String mainDirectory = "plugins" + File.separator + "Drill"; 
 	public File dir = new File(mainDirectory);
 	public String prefix = "[Drill]";
 	public String dbName = "drillDB";
-	public sqlCore dbManage = new sqlCore(this.log, this.prefix, this.dbName, this.mainDirectory );
+	//public sqlCore dbManage = new sqlCore(this.log, this.prefix, this.dbName, this.mainDirectory );
 	String tableName = "Drills";
 	
-	//Construct an PFintoDB obj, to be mapped into PFBlocks Table...
 	
 	public DrillToDB(){
 	}
@@ -67,20 +68,17 @@ public class DrillToDB {
 		 				  		  "'" + drillobj.Owner.toString() + "'" + "," +
 		 				  		  String.valueOf(drillobj.Direction)  + "," +
 		 				  		  String.valueOf(drillobj.Type)  +")"+ ";";
-		dbManage.initialize();
-		dbManage.insertQuery(insertDrill);
-		dbManage.close();
+		
+		Drill.getManager().insertQuery(insertDrill);
 	}
 	
 	//DELETE Query, delete a Record from DB by giving coordinates
 	public void deleteRecord(DrillToDB drillobj){
-		String deletePF = "DELETE FROM " + tableName  + " WHERE " + 
+		String deletedrill = "DELETE FROM " + tableName  + " WHERE " + 
 		  				  "BlockX" + " = " + "'" + String.valueOf(drillobj.BlockX) + "'" + "AND " +
 		  				  "BlockY" + " = " + "'" + String.valueOf(drillobj.BlockY) + "'" +  "AND " +
 		  				  "BlockZ" + " = " + "'" + String.valueOf(drillobj.BlockZ)+  "'" + ";" ;
-		dbManage.initialize();
-		dbManage.deleteQuery(deletePF); 
-		dbManage.close();
+		Drill.getManager().deleteQuery(deletedrill); 
 	}
 	
 	//These methods are  SELECT QUERIES to get info by passing blocks coordinates.
@@ -90,15 +88,15 @@ public class DrillToDB {
 		  				  "BlockX" + " = " + "'" + String.valueOf(blockX) + "'" + "AND " +
 		  				  "BlockY" + " = " + "'" + String.valueOf(blockY) + "'" +  "AND " +
 		  				  "BlockZ" + " = " + "'" + String.valueOf(blockZ)+  "'" +";" ;
-		  dbManage.initialize();
-          ResultSet rs = dbManage.sqlQuery(selectID);
+		  //dbManage.initialize();
+          ResultSet rs = Drill.getManager().sqlQuery(selectID);
           int Id = 0;
           try {
 			Id = rs.getInt("B_Id");
           } catch (SQLException e) {
 			e.printStackTrace();
           }
-          dbManage.close();
+          //dbManage.close();
           return Id;  
 	}
 	
@@ -108,15 +106,15 @@ public class DrillToDB {
 		  				  "BlockX" + " = " + "'" + String.valueOf(blockX) + "'" + "AND " +
 		  				  "BlockY" + " = " + "'" + String.valueOf(blockY) + "'" +  "AND " +
 		  				  "BlockZ" + " = " + "'" + String.valueOf(blockZ)+  "'" +";" ;
-		dbManage.initialize();
-        ResultSet rs = dbManage.sqlQuery(selectID);
+		//dbManage.initialize();
+        ResultSet rs = Drill.getManager().sqlQuery(selectID);
         String Owner ="";
 		try {
 			Owner = rs.getString("Owner");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        dbManage.close();
+        //dbManage.close();
         return Owner;
 	}
 	
@@ -126,15 +124,15 @@ public class DrillToDB {
 		  				  "BlockX" + " = " + "'" + String.valueOf(blockX) + "'" + "AND " +
 		                  "BlockY" + " = " + "'" + String.valueOf(blockY) + "'" +  "AND " +
 		                  "BlockZ" + " = " + "'" + String.valueOf(blockZ)+  "'" +";" ;
-        dbManage.initialize();
-        ResultSet rs = dbManage.sqlQuery(selectID);
+        //dbManage.initialize();
+        ResultSet rs = Drill.getManager().sqlQuery(selectID);
         int Type =0;
 		try {
 			Type = rs.getInt("Type");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        dbManage.close();
+        //dbManage.close();
         return Type;
 	}
 	//SELECT Query, SELECT the Record with the given coordinates, return its Direction
@@ -143,15 +141,15 @@ public class DrillToDB {
 		  				  "BlockX" + " = " + "'" + String.valueOf(blockX) + "'" + "AND " +
 		                  "BlockY" + " = " + "'" + String.valueOf(blockY) + "'" +  "AND " +
 		                  "BlockZ" + " = " + "'" + String.valueOf(blockZ)+  "'" +";" ;
-        dbManage.initialize();
-        ResultSet rs = dbManage.sqlQuery(selectID);
+        //dbManage.initialize();
+        ResultSet rs = Drill.getManager().sqlQuery(selectID);
         int Direction =0;
 		try {
 			Direction = rs.getInt("Direction");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        dbManage.close();
+        //dbManage.close();
         return Direction;
 	}
 	
@@ -161,30 +159,30 @@ public class DrillToDB {
 	public int getRecordType(int id2){
 		String selectID = "SELECT Type FROM " + tableName  + " WHERE " + 
 						  "B_Id " + " = " + "'" + String.valueOf(id2) + "'" + ";" ;
-        dbManage.initialize();
-        ResultSet rs = dbManage.sqlQuery(selectID);
+        //dbManage.initialize();
+        ResultSet rs = Drill.getManager().sqlQuery(selectID);
         int Type =0;
 		try {
 			Type = rs.getInt("Type");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        dbManage.close();
+        //dbManage.close();
         return Type;
 	}
 	//SELECT Query, SELECT the Record with the given id, return its Type
 	public int getRecordDirection(int id){
 		String selectID = "SELECT Direction FROM " + tableName  + " WHERE " + 
 						  "B_Id " + " = " + "'" + String.valueOf(id) + "'" + ";" ;
-        dbManage.initialize();
-        ResultSet rs = dbManage.sqlQuery(selectID);
+        //dbManage.initialize();
+        ResultSet rs = Drill.getManager().sqlQuery(selectID);
         int Direction =0;
 		try {
 			Direction = rs.getInt("Direction");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        dbManage.close();
+        //dbManage.close();
         return Direction;
 	}
 	
@@ -193,15 +191,15 @@ public class DrillToDB {
 	public String getRecordOwner(int id){
 		String selectID = "SELECT Owner FROM " + tableName  + " WHERE " + 
 			              "B_Id " + " = " + "'" + String.valueOf(id) + "'"  + ";" ;
-		dbManage.initialize();
-        ResultSet rs = dbManage.sqlQuery(selectID);
+		//dbManage.initialize();
+        ResultSet rs = Drill.getManager().sqlQuery(selectID);
         String Owner ="";
 		try {
 			Owner = rs.getString("Owner");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        dbManage.close();
+        //dbManage.close();
         return Owner;
 	}
 	
@@ -209,30 +207,30 @@ public class DrillToDB {
 	public int getRecordBlockX(int id){
 		String selectID = "SELECT BlockX FROM " + tableName  + " WHERE " + 
 						  "B_Id " + " = " + "'" + String.valueOf(id) + "'" + ";" ;
-        dbManage.initialize();
-        ResultSet rs = dbManage.sqlQuery(selectID);
+        //dbManage.initialize();
+        ResultSet rs = Drill.getManager().sqlQuery(selectID);
         int BlockX =0;
 		try {
 			BlockX = rs.getInt("BlockX");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        dbManage.close();
+        //dbManage.close();
         return BlockX;
 	}
 	//SELECT Query, SELECT the Record with the given id, return its BlockY
 	public int getRecordBlockY(int id){
 		String selectID = "SELECT BlockY FROM " + tableName  + " WHERE " + 
 						  "B_Id " + " = " + "'" + String.valueOf(id) + "'" + ";" ;
-        dbManage.initialize();
-        ResultSet rs = dbManage.sqlQuery(selectID);
+        //dbManage.initialize();
+        ResultSet rs = Drill.getManager().sqlQuery(selectID);
         int BlockY =0;
 		try {
 			BlockY = rs.getInt("BlockY");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        dbManage.close();
+        //dbManage.close();
         return BlockY;
 	}
 	
@@ -240,15 +238,15 @@ public class DrillToDB {
 	public int getRecordBlockZ(int id){
 		String selectID = "SELECT BlockZ FROM " + tableName  + " WHERE " + 
 						  "B_Id " + " = " + "'" + String.valueOf(id) + "'" + ";" ;
-        dbManage.initialize();
-        ResultSet rs = dbManage.sqlQuery(selectID);
+        //dbManage.initialize();
+        ResultSet rs = Drill.getManager().sqlQuery(selectID);
         int BlockZ =0;
 		try {
 			BlockZ = rs.getInt("BlockZ");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        dbManage.close();
+        //dbManage.close();
         return BlockZ;
 	}
 	
@@ -259,9 +257,9 @@ public class DrillToDB {
 							"'" + String.valueOf(type) + "'" +
 							"WHERE B_Id" +
 		                    " = " + "'" + String.valueOf(id) + "'" + ";";
-		dbManage.initialize();
-		dbManage.updateQuery(updateLink);
-		dbManage.close();
+		//dbManage.initialize();
+		Drill.getManager().updateQuery(updateLink);
+		//dbManage.close();
 	}
 	
 	//UPDATE Direction Query
@@ -270,23 +268,23 @@ public class DrillToDB {
 							"'" + String.valueOf(direction) + "'" +
 							"WHERE B_Id" +
 		                    " = " + "'" + String.valueOf(id) + "'" + ";";
-		dbManage.initialize();
-		dbManage.updateQuery(updateLink);
-		dbManage.close();
+		//dbManage.initialize();
+		Drill.getManager().updateQuery(updateLink);
+		//dbManage.close();
 	}
 	
 	//SELECT COUNT QUERY
 	public int exists(int id){
 		String selectcountID = "SELECT COUNT(B_Id) AS result FROM " + tableName + " WHERE B_Id = " + "'" + id + "'" + ";"; 
-        dbManage.initialize();
-        ResultSet rs = dbManage.sqlQuery(selectcountID);
+        //dbManage.initialize();
+        ResultSet rs = Drill.getManager().sqlQuery(selectcountID);
         int count = 1;
 		try {
 			count = rs.getInt("result");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        dbManage.close();
+        //dbManage.close();
         return count;
 	}
 	
@@ -295,15 +293,15 @@ public class DrillToDB {
 		  					   "BlockX" + " = " + "'" + String.valueOf(blockX) + "'" + " AND " +
 		  					   "BlockY" + " = " + "'" + String.valueOf(blockY) + "'" +  " AND " +
 		  					   "BlockZ" + " = " + "'" + String.valueOf(blockZ)+  "'" +";" ;
-        dbManage.initialize();
-        ResultSet rs = dbManage.sqlQuery(selectcountID);
+        //dbManage.initialize();
+        ResultSet rs = Drill.getManager().sqlQuery(selectcountID);
         int count = 0;
 		try {
 			count = rs.getInt("result");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-        dbManage.close();
+        //dbManage.close();
         if(count == 0){
         	return false;
         }

@@ -15,11 +15,12 @@ import org.bukkit.plugin.Plugin;
 
 public class Drill  extends JavaPlugin {
 	//DB Directory Stuff
-	public String mainDirectory = "plugins" + File.separator + "Drill"; 
+	public static String mainDirectory = "plugins" + File.separator + "Drill"; 
 	public File dir = new File(mainDirectory);
-	public String prefix = "[Drill]";
-	public String dbName = "drillDB";
-	public sqlCore dbManage;
+	public static String prefix = "[Drill]";
+	public static String dbName = "drillDB";
+	static Logger log = Logger.getLogger("Minecraft");//Define your logger
+	private static sqlCore dbManage =  new sqlCore(log, prefix, dbName, mainDirectory );
 		
 	//Create Drills table Query
 	public String DBTableQuery ="CREATE TABLE Drills" +
@@ -36,11 +37,14 @@ public class Drill  extends JavaPlugin {
     //Listeners
     private final DrillPlayerListener playerListener = new DrillPlayerListener(this);
     private final DrillBlockListener blockListener = new DrillBlockListener(this);
-    
+   
     //Permission handler
     public static PermissionHandler permissionHandler;
    
-    Logger log = Logger.getLogger("Minecraft");//Define your logger
+    //utils
+    public static sqlCore getManager(){
+    	return dbManage;
+    }
     
     public void createPluginFolder(){
     	if(!this.dir.exists()){
@@ -61,7 +65,7 @@ public class Drill  extends JavaPlugin {
             }
         }
     }
-    
+     
     public void onDisable() {
     	if(dbManage != null){
     		dbManage.close();
@@ -73,16 +77,15 @@ public class Drill  extends JavaPlugin {
     PluginManager pm = this.getServer().getPluginManager();
     log.info("Drill Plugin ENABLED");
     createPluginFolder();
-    sqlCore dbManage = new sqlCore(this.log, this.prefix, this.dbName, this.mainDirectory );
     dbManage.initialize();
     if(!dbManage.checkTable("Drills")){
     	 dbManage.createTable(DBTableQuery);
-    	 dbManage.close();
-    	 dbManage.initialize();
+    	 //dbManage.close();
+    	 //dbManage.initialize();
     	 //Create first row (record) on the table
     	 DrillToDB drillobj = new DrillToDB(0,0,0);
     	 drillobj.toRecord(drillobj);
-    	 dbManage.close();
+    	 //dbManage.close();
     }
     //Permissions loading
     setupPermissions();
