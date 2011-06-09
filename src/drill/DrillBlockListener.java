@@ -2,6 +2,7 @@ package drill;
 
 import java.util.logging.Logger;
 
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.*;
@@ -10,13 +11,14 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.PluginManager;
 
 public class DrillBlockListener extends BlockListener{
 	
     //Blocks IDs
 	int base = 61;//id OBS
-	int topiron = 42; //id IRON
-	int topdiamond = 57; // id GOLD
+	/*int topiron = 42; //id IRON
+	int topdiamond = 57; // id GOLD*/
 	int bedrock = 7;
 	int water = 8;
 	int waterbis = 9;
@@ -24,15 +26,8 @@ public class DrillBlockListener extends BlockListener{
 	int lavabis = 11;
 	int dungeon = 52;
 	int fire = 51;
-	
-	
-	//Fuel
-	int sugar = 353;
-	
-	//Drill distance
-	double maxDistance = 65;
-	
-	
+	int chest = 54;
+		
 	//Logger
     Logger log = Logger.getLogger("Minecraft");
 	
@@ -123,24 +118,33 @@ public class DrillBlockListener extends BlockListener{
     	//Furnace Fuel Slot from 0 to 2
     	//Fuel slot is 1.
     	//Check fuel q. and consume
-    	if(furnaceInv.getItem(1).getTypeId() == sugar){
+    	if(furnaceInv.getItem(1).getTypeId() == plugin.FuelId){
 	    	int fuelQ = furnaceInv.getItem(1).getAmount();
 	    	int fuelconsumed = consumeFuel(drillobj.getObjType());
 	    	int fuelremained = fuelQ - fuelconsumed;
 	    	if(fuelremained <= 0){
-	    		furnaceInv.remove(sugar);
+	    		furnaceInv.remove(plugin.FuelId);
 	    		return;
 	    	}	    	   	
 	    	int offset = getOffset(world, drillobj.getObjDirection(), drillobj.getObjBlockX(), drillobj.getObjBlockY(), drillobj.getObjBlockZ());
 	    	Block targetBlock = getTargetBlock(world, drillobj.getObjDirection(), drillobj.getObjBlockX(), drillobj.getObjBlockY(), drillobj.getObjBlockZ(), offset);
-			int targetId = targetBlock.getTypeId();
+			
+	    	//World guard...  
+	    	if(((PluginManager) plugin).getPlugin("WorldGuard").isEnabled()== true ){
+			}
+	    	int targetId = targetBlock.getTypeId();
 			if(targetId== 0){
 				return;
 			}
+			//If TNT
+			if(targetId == 46){
+				world.getBlockAt(targetBlock.getX(),targetBlock.getY()+1,targetBlock.getZ()).setTypeId(fire);
+				return;
+			}
 			if(canBeDrilled(targetId) == true){
-				ItemStack sugarStack = new ItemStack(sugar, fuelremained);
-		    	furnaceInv.remove(sugar);
-		    	furnaceInv.setItem(1,sugarStack);
+				ItemStack fuelStack = new ItemStack(plugin.FuelId, fuelremained);
+		    	furnaceInv.remove(plugin.FuelId);
+		    	furnaceInv.setItem(1,fuelStack);
 				destroyDrilledBlock(targetBlock);
 				dropDrilledBlock(world, targetId, block);
 			}
@@ -156,7 +160,7 @@ public class DrillBlockListener extends BlockListener{
     public int getOffset(World world, int direction, int x, int y, int z){
     	int i = 0;
 		if(direction == 1){
-			for(i=1; i<=65; i++){
+			for(i=1; i<=plugin.MaxDistance; i++){
 				Block next = world.getBlockAt(x,y+1+i,z);
 				if(next.getTypeId()!= 0){
 					return i;
@@ -164,7 +168,7 @@ public class DrillBlockListener extends BlockListener{
 			}
 		}
     	if(direction == 2){
-			for(i=1; i<=65; i++){
+			for(i=1; i<=plugin.MaxDistance; i++){
 				Block next = world.getBlockAt(x,y-1-i,z);
 				if(next.getTypeId()!= 0){
 					return i;
@@ -172,7 +176,7 @@ public class DrillBlockListener extends BlockListener{
 			}	
         }
     	if(direction == 3){
-			for(i=1; i<=65; i++){
+			for(i=1; i<=plugin.MaxDistance; i++){
 				Block next = world.getBlockAt(x+1+i,y,z);
 				if(next.getTypeId()!= 0){
 					return i;
@@ -180,7 +184,7 @@ public class DrillBlockListener extends BlockListener{
 			}	
         }
     	if(direction == 4){			
-    		for(i=1; i<=65; i++){
+    		for(i=1; i<=plugin.MaxDistance; i++){
 			Block next = world.getBlockAt(x-1-i,y,z);
 			if(next.getTypeId()!= 0){
 				return i;
@@ -189,7 +193,7 @@ public class DrillBlockListener extends BlockListener{
     		}
     	}
     	if(direction == 5){
-			for(i=1; i<=65; i++){
+			for(i=1; i<=plugin.MaxDistance; i++){
 				Block next = world.getBlockAt(x,y,z+1+i);
 				if(next.getTypeId()!= 0){
 					return i;
@@ -197,7 +201,7 @@ public class DrillBlockListener extends BlockListener{
 			}	
         }
     	if(direction == 6){
-			for(i=1; i<=65; i++){
+			for(i=1; i<=plugin.MaxDistance; i++){
 				Block next = world.getBlockAt(x,y,z-1-i);
 				if(next.getTypeId()!= 0){
 					return i;
@@ -237,7 +241,7 @@ public class DrillBlockListener extends BlockListener{
     }
     
     public boolean canBeDrilled(int id){
-    	if(id!=bedrock && id != water && id != waterbis && id != lava && id != lavabis && id != dungeon && id != fire){
+    	if(id!=bedrock && id != water && id != waterbis && id != lava && id != lavabis && id != dungeon && id != fire && id != chest){
     		return true;
     	}
     	return false;
@@ -269,6 +273,9 @@ public class DrillBlockListener extends BlockListener{
     		world.dropItemNaturally(loc, drop);
     		return;
     	}
+    	if(targetId == 20){
+    		return;
+    	}
     	ItemStack drop = new ItemStack(targetId, 1);
     	world.dropItemNaturally(loc, drop);
     	return;
@@ -282,10 +289,10 @@ public class DrillBlockListener extends BlockListener{
     //Return the fuel amount consumed by drill
     public int consumeFuel(int type){
     	if(type == 1){
-    		return 2;
+    		return plugin.TypeOneFuelxBlock;
     	}
     	if(type == 2){
-    		return 1;
+    		return plugin.TypeTwoFuelxBlock;
     	}
     	return 0;
     }
@@ -295,7 +302,7 @@ public class DrillBlockListener extends BlockListener{
     public void onBlockBreak(BlockBreakEvent event){
     	Block block = event.getBlock();
     	//If IronBlock is broken
-    	if(block.getTypeId() == topiron){
+    	if(block.getTypeId() == plugin.TypeOneId){
     		//Check if it was a Drill part
     		int direction = isFurnaceBase(block);
     		if(direction !=0){
@@ -309,7 +316,7 @@ public class DrillBlockListener extends BlockListener{
 	    	}
     	}
     	//If DiamondBlock is broken
-    	if(block.getTypeId() == topdiamond){
+    	if(block.getTypeId() == plugin.TypeTwoId){
     		//Check if it was a Drill part
     		int direction = isFurnaceBase(block);
     		if(direction !=0){

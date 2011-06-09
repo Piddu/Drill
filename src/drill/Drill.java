@@ -14,6 +14,7 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 import org.bukkit.plugin.Plugin;
 
 public class Drill  extends JavaPlugin {
+	
 	//DB Directory Stuff
 	public static String mainDirectory = "plugins" + File.separator + "Drill"; 
 	public File dir = new File(mainDirectory);
@@ -34,6 +35,18 @@ public class Drill  extends JavaPlugin {
 			"Type int DEFAULT '0'" +
 			")" + ";"; 
 
+	//Config File
+	public String enabledstartup = "Enabled On Startup";
+	public String TypeOneName;
+	public String TypeTwoName;
+	public int TypeOneId;
+	public int TypeTwoId;
+	public int FuelId;
+	public int TypeOneFuelxBlock;
+	public int TypeTwoFuelxBlock;
+	public int MaxDistance;
+	Config config = new Config(this);
+	
     //Listeners
     private final DrillPlayerListener playerListener = new DrillPlayerListener(this);
     private final DrillBlockListener blockListener = new DrillBlockListener(this);
@@ -77,6 +90,7 @@ public class Drill  extends JavaPlugin {
     PluginManager pm = this.getServer().getPluginManager();
     log.info("Drill Plugin ENABLED");
     createPluginFolder();
+    config.configCheck();
     dbManage.initialize();
     if(!dbManage.checkTable("Drills")){
     	 dbManage.createTable(DBTableQuery);

@@ -13,16 +13,19 @@ import org.bukkit.event.block.Action;
 
 public class DrillPlayerListener extends PlayerListener{
 	
-	//PF Blocks Stuff
-	public int base = 61; //Furnace block id
-	public int topiron = 42;  //Iron id
-	public int topdiamond = 57;  //Diamond block id
 	
     public static Drill plugin;
+    
     
     public DrillPlayerListener(Drill instance) {
             plugin = instance;
     }
+    
+    //Drill Blocks Stuff
+	public int base = 61; //Furnace block id
+	/*public int topiron = plugin.TypeOneId;  //Iron id
+	public int topdiamond = plugin.TypeTwoId;  //Diamond block id*/
+	
     
     Logger log = Logger.getLogger("Minecraft");//Define your logger
     
@@ -33,7 +36,7 @@ public class DrillPlayerListener extends PlayerListener{
     public boolean isIron(Block clicked){
     	World world = clicked.getWorld();
 		Block tblock = world.getBlockAt(clicked.getX(), clicked.getY()+1, clicked.getZ());
-		if(tblock.getTypeId() == topiron){
+		if(tblock.getTypeId() == plugin.TypeOneId){
 			return true;
 		}
     	return false;
@@ -42,7 +45,7 @@ public class DrillPlayerListener extends PlayerListener{
     public boolean isDiamond(Block clicked){
     	World world = clicked.getWorld();
 		Block tblock = world.getBlockAt(clicked.getX(), clicked.getY()+1, clicked.getZ());
-		if(tblock.getTypeId() == topdiamond){
+		if(tblock.getTypeId() == plugin.TypeTwoId){
 			return true;
 		}
     	return false;
@@ -111,7 +114,7 @@ public class DrillPlayerListener extends PlayerListener{
     	Action act = event.getAction();
     	if(act.toString() == "LEFT_CLICK_BLOCK"){
         	Block clicked = event.getClickedBlock();
-        	if(clicked.getTypeId()== topiron){
+        	if(clicked.getTypeId()== plugin.TypeOneId){
         		int direction = 0;
         		direction = isFurnaceBase(clicked);
         		if (direction != 0 ){
@@ -120,7 +123,7 @@ public class DrillPlayerListener extends PlayerListener{
         			if(check.existsXYZ(furnaceBlock.getX(), furnaceBlock.getY(), furnaceBlock.getZ()) == false){
 		        		//permission check
 	        			if (Drill.permissionHandler.has(event.getPlayer(), "Drill.Iron") == true){	
-	        				event.getPlayer().sendMessage(ChatColor.GRAY + "Iron Drill is SetUp!");
+	        				event.getPlayer().sendMessage(ChatColor.GRAY + plugin.TypeOneName.toString() + " Drill is SetUp!");
 	        				DrillToDB drillobj = new DrillToDB(furnaceBlock.getX(), furnaceBlock.getY(), furnaceBlock.getZ());
 	        				drillobj.setObjType(1);
 	        				drillobj.setObjOwner(event.getPlayer().getName());
@@ -135,7 +138,7 @@ public class DrillPlayerListener extends PlayerListener{
 	        		}
         		}
         	}
-        	if(clicked.getTypeId()== topdiamond){
+        	if(clicked.getTypeId()== plugin.TypeTwoId){
         		int direction = 0;
         		direction = isFurnaceBase(clicked);
         		if (direction != 0 ){
@@ -144,7 +147,7 @@ public class DrillPlayerListener extends PlayerListener{
         			if(check.existsXYZ(furnaceBlock.getX(), furnaceBlock.getY(), furnaceBlock.getZ()) == false){
 	        		//permission check
 	        			if (Drill.permissionHandler.has(event.getPlayer(), "Drill.Diamond") == true){
-	        				event.getPlayer().sendMessage(ChatColor.AQUA + "Diamond Drill is SetUp!");
+	        				event.getPlayer().sendMessage(ChatColor.AQUA + plugin.TypeTwoName.toString() + " Drill is SetUp!");
 	        				DrillToDB drillobj = new DrillToDB(furnaceBlock.getX(), furnaceBlock.getY(), furnaceBlock.getZ());
 	        				drillobj.setObjType(2);
 	        				drillobj.setObjOwner(event.getPlayer().getName());
@@ -165,16 +168,3 @@ public class DrillPlayerListener extends PlayerListener{
  
 }
     
-    
-	/*Furnace furnace = (Furnace)getFurnace(clicked, direction).getState();
-	Inventory furnaceInv = furnace.getInventory();
-	//Furnace Fuel Slot from 0 to 2
-	//Fuel slot is 1.
-	if(furnaceInv.getItem(1).getTypeId() == 338){
-		event.getPlayer().sendMessage(ChatColor.GREEN + "Furnace is fueled");
-	}
-	else{
-		int size = furnaceInv.getSize();
-		event.getPlayer().sendMessage(ChatColor.GREEN + "Furnace is not fueled");
-
-	}*/
