@@ -18,7 +18,7 @@ public class Config {
     public String TypeTwoName = "Diamond";
     public int TypeOneId =42; 		//IronBlock
     public int TypeTwoId=57;  		//DiamondBlock
-    public int FuelId = 353;  		
+    public int FuelId = 338;  		
     public int TypeOneFuelxBlock = 2; //FuelConsumed By TypeOneDrill
     public int TypeTwoFuelxBlock = 1; //FuelConsumed By TypeTwoDrill
     public int MaxDistance = 65;

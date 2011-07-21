@@ -11,14 +11,13 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.PluginManager;
 
 public class DrillBlockListener extends BlockListener{
 	
     //Blocks IDs
 	int base = 61;//id OBS
 	/*int topiron = 42; //id IRON
-	int topdiamond = 57; // id GOLD*/
+	int topdiamond = 57; // id Diamond*/
 	int bedrock = 7;
 	int water = 8;
 	int waterbis = 9;
@@ -130,17 +129,20 @@ public class DrillBlockListener extends BlockListener{
 	    	Block targetBlock = getTargetBlock(world, drillobj.getObjDirection(), drillobj.getObjBlockX(), drillobj.getObjBlockY(), drillobj.getObjBlockZ(), offset);
 			
 	    	//World guard...  
-	    	if(((PluginManager) plugin).getPlugin("WorldGuard").isEnabled()== true ){
-			}
+	    	/*if(((PluginManager) plugin).getPlugin("WorldGuard").isEnabled()== true ){
+			}*/
 	    	int targetId = targetBlock.getTypeId();
 			if(targetId== 0){
 				return;
 			}
 			//If TNT
 			if(targetId == 46){
-				world.getBlockAt(targetBlock.getX(),targetBlock.getY()+1,targetBlock.getZ()).setTypeId(fire);
+				targetBlock.setTypeId(0);
+				world.createExplosion(targetBlock.getLocation(), 4.0F);
 				return;
 			}
+			drillHeadBreak(targetBlock);
+			drillFurnaceBreak(targetBlock);
 			if(canBeDrilled(targetId) == true){
 				ItemStack fuelStack = new ItemStack(plugin.FuelId, fuelremained);
 		    	furnaceInv.remove(plugin.FuelId);
@@ -299,9 +301,7 @@ public class DrillBlockListener extends BlockListener{
     
     //EVENTS 
     
-    public void onBlockBreak(BlockBreakEvent event){
-    	Block block = event.getBlock();
-    	//If IronBlock is broken
+    public void drillHeadBreak(Block block){
     	if(block.getTypeId() == plugin.TypeOneId){
     		//Check if it was a Drill part
     		int direction = isFurnaceBase(block);
@@ -311,9 +311,12 @@ public class DrillBlockListener extends BlockListener{
     			DrillToDB drillobj = new DrillToDB(furnaceblock.getX(), furnaceblock.getY(), furnaceblock.getZ());
     			if(drillobj.existsXYZ(furnaceblock.getX(), furnaceblock.getY(), furnaceblock.getZ())== true){
 	    			drillobj.deleteRecord(drillobj);
+	    			furnaceblock.setTypeId(0);
+	    			ItemStack drop = new ItemStack(61, 1);
+	    			furnaceblock.getWorld().dropItemNaturally(furnaceblock.getLocation(), drop);
     			}
 	    		return;
-	    	}
+	    		}
     	}
     	//If DiamondBlock is broken
     	if(block.getTypeId() == plugin.TypeTwoId){
@@ -325,11 +328,16 @@ public class DrillBlockListener extends BlockListener{
     			DrillToDB drillobj = new DrillToDB(furnaceblock.getX(), furnaceblock.getY(), furnaceblock.getZ());
     			if(drillobj.existsXYZ(furnaceblock.getX(), furnaceblock.getY(), furnaceblock.getZ())== true){
 	    			drillobj.deleteRecord(drillobj);
+	    			furnaceblock.setTypeId(0);
+	    			ItemStack drop = new ItemStack(61, 1);
+	    			furnaceblock.getWorld().dropItemNaturally(furnaceblock.getLocation(), drop);
     			}
 	    		return;
-	    	}
+    			}
     	}
-    	//If a FurnaceBlock is broken
+    }
+    
+    public void drillFurnaceBreak(Block block){
     	if(block.getTypeId() == base){
     		//Check if was a Drill part - exists in DB
     		DrillToDB drillobj = new DrillToDB(block.getX(), block.getY(), block.getZ());
@@ -338,6 +346,14 @@ public class DrillBlockListener extends BlockListener{
 			}
     	}
     	return;
+    }
+    
+    public void onBlockBreak(BlockBreakEvent event){
+    	Block block = event.getBlock();
+    	//If Drill head is broken
+    	drillHeadBreak(block);
+    	//If a FurnaceBlock is broken
+    	drillFurnaceBreak(block);
     }
     
     public void onBlockRedstoneChange(BlockRedstoneEvent event){
