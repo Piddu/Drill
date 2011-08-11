@@ -1,16 +1,20 @@
 package drill;
 
+import java.util.List;
 import java.util.logging.Logger;
-
 
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.*;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.*;
+
+import com.sk89q.worldguard.*;
 
 public class DrillBlockListener extends BlockListener{
 	
@@ -128,9 +132,25 @@ public class DrillBlockListener extends BlockListener{
 	    	int offset = getOffset(world, drillobj.getObjDirection(), drillobj.getObjBlockX(), drillobj.getObjBlockY(), drillobj.getObjBlockZ());
 	    	Block targetBlock = getTargetBlock(world, drillobj.getObjDirection(), drillobj.getObjBlockX(), drillobj.getObjBlockY(), drillobj.getObjBlockZ(), offset);
 			
-	    	//World guard...  
-	    	/*if(((PluginManager) plugin).getPlugin("WorldGuard").isEnabled()== true ){
-			}*/
+	    	//World guard...
+	    	String drillowner = drillobj.getObjOwner();
+	    	Player user = isOwnerOnline(world, drillowner);
+	    	if(Drill.pm.isPluginEnabled("WorldGuard")==true){
+	    		//log.info("WG is enabled...checking");
+	    		//log.info("This drill is owned by:" + drillowner);
+	    		if(user != null){
+	    			//log.info("checkin if owner:" + drillowner + " can drill the area");
+	    			if(Drill.WGplugin.canBuild(user , targetBlock)!= true){
+	    				//log.info("owner:" + drillowner + "cannot drill here" );
+	    				return;
+	    			}
+	    		}
+	    		else
+	    		{
+	    			//log.info("Drill's owner :" + drillowner + " not online cannot operate");
+	    			return;	
+	    		}
+			}
 	    	int targetId = targetBlock.getTypeId();
 			if(targetId== 0){
 				return;
@@ -147,7 +167,7 @@ public class DrillBlockListener extends BlockListener{
 				ItemStack fuelStack = new ItemStack(plugin.FuelId, fuelremained);
 		    	furnaceInv.remove(plugin.FuelId);
 		    	furnaceInv.setItem(1,fuelStack);
-				destroyDrilledBlock(targetBlock);
+				destroyDrilledBlock(targetBlock, user);
 				dropDrilledBlock(world, targetId, block);
 			}
     		else{
@@ -284,7 +304,13 @@ public class DrillBlockListener extends BlockListener{
     }
     
     //Destroy selected block
-    public void destroyDrilledBlock(Block block){
+    public void destroyDrilledBlock(Block block, Player player){
+    	if(Drill.pm.isPluginEnabled("BigBrother")==true){
+    		BlockBreakEvent BBbreak = new BlockBreakEvent(block, player);
+    		Drill.pm.callEvent(BBbreak);
+    		block.setTypeId(0);
+    		return;
+    	}
     	block.setTypeId(0);
     }
     
@@ -297,6 +323,23 @@ public class DrillBlockListener extends BlockListener{
     		return plugin.TypeTwoFuelxBlock;
     	}
     	return 0;
+    }
+    
+    public Player isOwnerOnline(World world, String owner){
+    	List players = world.getPlayers();
+		int max = players.size();
+		int i=0;
+		for (i=0; i<max; i++){
+			Player user = (Player)players.get(i);
+			//log.info(user.getDisplayName());
+			if(user.getDisplayName().equals(owner)){
+				if(user.isOnline()== true){
+					//log.info("Owner is online:" + owner);
+				return user;
+				}
+			}
+		}
+		return null;	
     }
     
     //EVENTS 

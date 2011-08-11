@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="C:/Documents and Settings/Marco/Desktop/Permissions-bin/Permissions.jar"/>
 	<classpathentry kind="lib" path="D:/Minecraft Server/craftbukkit-0.0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Documents and Settings/Marco/Desktop/bukkit-0.0.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Documents and Settings/Marco/Desktop/WorldGuard.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

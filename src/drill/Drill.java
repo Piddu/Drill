@@ -13,6 +13,8 @@ import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import org.bukkit.plugin.Plugin;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
 public class Drill  extends JavaPlugin {
 	
 	//DB Directory Stuff
@@ -53,7 +55,11 @@ public class Drill  extends JavaPlugin {
    
     //Permission handler
     public static PermissionHandler permissionHandler;
-   
+    //WG
+    public static WorldGuardPlugin WGplugin;
+    //Plugins
+    public static PluginManager pm;
+  
     //utils
     public static sqlCore getManager(){
     	return dbManage;
@@ -78,7 +84,20 @@ public class Drill  extends JavaPlugin {
             }
         }
     }
+    
+    //WG     
+    public void setupWorldGuard() {
+        Plugin wgplugin = getServer().getPluginManager().getPlugin("WorldGuard");
      
+        // WorldGuard may not be loaded
+        if (wgplugin == null || !(wgplugin instanceof WorldGuardPlugin)) {
+            return ; // Maybe you want throw an exception instead
+        }
+     
+        WGplugin = (WorldGuardPlugin) wgplugin;
+    }
+    
+    
     public void onDisable() {
     	if(dbManage != null){
     		dbManage.close();
@@ -87,7 +106,7 @@ public class Drill  extends JavaPlugin {
     }
 
     public void onEnable() {     
-    PluginManager pm = this.getServer().getPluginManager();
+    pm = this.getServer().getPluginManager();
     log.info("Drill Plugin ENABLED");
     createPluginFolder();
     config.configCheck();
@@ -103,6 +122,8 @@ public class Drill  extends JavaPlugin {
     }
     //Permissions loading
     setupPermissions();
+    //WGloading
+    setupWorldGuard();
     //Plugin Commands
 	
 	//Event listener

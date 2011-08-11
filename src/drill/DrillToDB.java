@@ -8,8 +8,6 @@ import java.util.logging.Logger;
 
 import com.alta189.sqlLibrary.SQLite.sqlCore;
 
-//import com.alta189.sqlLibrary.SQLite.*;
-
 
 public class DrillToDB {
 	
